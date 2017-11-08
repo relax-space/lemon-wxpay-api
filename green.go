@@ -53,7 +53,24 @@ func PayGreen(c echo.Context) error {
 }
 
 func QueryGreen(c echo.Context) error {
-	return nil
+	reqDto := wxpay.ReqQueryDto{}
+	if err := c.Bind(&reqDto); err != nil {
+		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+	}
+
+	account := Account()
+	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+		AppId: account.AppId,
+		MchId: account.MchId,
+	}
+	customDto := wxpay.ReqCustomerDto{
+		Key: account.Key,
+	}
+	result, err := wxpay.Query(reqDto, customDto)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+	}
+	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
 }
 func RefundGreen(c echo.Context) error {
 	reqDto := wxpay.ReqRefundDto{}
