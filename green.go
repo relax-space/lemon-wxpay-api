@@ -1,7 +1,8 @@
-package wxpayapi
+package main
 
 import (
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -15,7 +16,8 @@ import (
 func PayGreen(c echo.Context) error {
 	reqDto := wxpay.ReqPayDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
 	}
 
 	account := Account()
@@ -42,8 +44,10 @@ func PayGreen(c echo.Context) error {
 					OutTradeNo: result["out_trade_no"].(string),
 				}
 				_, err = wxpay.Reverse(reverseDto, customDto, 10, 10)
-				return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+				return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
 			}
+		} else {
+			return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
 		}
 	}
 	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
