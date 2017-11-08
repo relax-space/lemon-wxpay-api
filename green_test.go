@@ -17,7 +17,7 @@ import (
 func Test_PayGreen(t *testing.T) {
 	bodyStr := `
 	{
-		"auth_code":"135206758040115935",
+		"auth_code":"135298324463700425",
 		"body":"xiaoxinmiao test",
 		"total_fee":1
 	}`
@@ -27,6 +27,43 @@ func Test_PayGreen(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 	test.Ok(t, PayGreen(c))
+	v := model.Result{}
+	test.Ok(t, json.Unmarshal(rec.Body.Bytes(), &v))
+	fmt.Printf("%+v", v)
+	test.Equals(t, http.StatusOK, rec.Code)
+
+}
+
+func Test_RefundGreen(t *testing.T) {
+	bodyStr := `
+	{
+		"out_trade_no":"147688874645492354650",
+		"refund_fee":1
+	}`
+	req, err := http.NewRequest(echo.POST, "/v1/green/refund", strings.NewReader(bodyStr))
+	test.Ok(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := echo.New().NewContext(req, rec)
+	test.Ok(t, RefundGreen(c))
+	v := model.Result{}
+	test.Ok(t, json.Unmarshal(rec.Body.Bytes(), &v))
+	fmt.Printf("%+v", v)
+	test.Equals(t, http.StatusOK, rec.Code)
+
+}
+
+func Test_ReverseGreen(t *testing.T) {
+	bodyStr := `
+	{
+		"out_trade_no":"143420620288156126697"
+	}`
+	req, err := http.NewRequest(echo.POST, "/v1/green/reverse", strings.NewReader(bodyStr))
+	test.Ok(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := echo.New().NewContext(req, rec)
+	test.Ok(t, ReverseGreen(c))
 	v := model.Result{}
 	test.Ok(t, json.Unmarshal(rec.Body.Bytes(), &v))
 	fmt.Printf("%+v", v)
