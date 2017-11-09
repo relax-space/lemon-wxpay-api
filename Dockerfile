@@ -9,7 +9,7 @@ RUN go get github.com/relax-space/lemon-wxpay && \
 # add application
 ADD . /go/src/lemon-wxpay-api
 WORKDIR /go/src/lemon-wxpay-api
-RUN tar xf /tmp/wxcert.tar.gz
+RUN tar xf tmp/wxcert.tar.gz
 RUN go install
 
 EXPOSE 5000
