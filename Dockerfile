@@ -3,8 +3,8 @@ MAINTAINER jang.jaehue@eland.co.kr
 ARG CERT_FILE
 
 # install go packages
-RUN go get -v -u github.com/relax-space/lemon-wxpay && \
-    go get -v -u github.com/relax-space/go-kit/...
+RUN go get github.com/relax-space/lemon-wxpay && \
+    go get github.com/relax-space/go-kit/...
 
 # setup swagger-ui
 ADD $CERT_FILE /tmp/wxcert.tar.gz
