@@ -119,6 +119,27 @@ func ReverseGreen(c echo.Context) error {
 	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
 }
 
+func RefundQueryGreen(c echo.Context) error {
+	reqDto := wxpay.ReqRefundQueryDto{}
+	if err := c.Bind(&reqDto); err != nil {
+		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+	}
+
+	account := Account()
+	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+		AppId: account.AppId,
+		MchId: account.MchId,
+	}
+	customDto := wxpay.ReqCustomerDto{
+		Key: account.Key,
+	}
+	result, err := wxpay.RefundQuery(reqDto, customDto)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+	}
+	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+}
+
 func Account() greenAccount {
 
 	account := greenAccount{AppId: *appId, Key: *key, MchId: *mchId,
