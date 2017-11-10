@@ -88,3 +88,21 @@ func Test_QueryGreen(t *testing.T) {
 	test.Equals(t, http.StatusOK, rec.Code)
 
 }
+
+func Test_RefundQueryGreen(t *testing.T) {
+	bodyStr := `
+	{
+		"out_trade_no":"144650782494807835413"
+	}`
+	req, err := http.NewRequest(echo.POST, "/v1/green/refundquery", strings.NewReader(bodyStr))
+	test.Ok(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := echo.New().NewContext(req, rec)
+	test.Ok(t, RefundQueryGreen(c))
+	v := model.Result{}
+	test.Ok(t, json.Unmarshal(rec.Body.Bytes(), &v))
+	fmt.Printf("%+v", v)
+	test.Equals(t, http.StatusOK, rec.Code)
+
+}
