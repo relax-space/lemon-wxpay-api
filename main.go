@@ -39,5 +39,7 @@ func RegApi(e *echo.Echo) {
 	green.POST("/reverse", ReverseGreen)
 	green.POST("/refund", RefundGreen)
 	green.POST("/refundquery", RefundQueryGreen)
+	green.POST("/prepay", PrePayGreen)
+	green.POST("/notify", NotifyGreen)
 
 }
