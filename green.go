@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/relax-space/go-kit/model"
@@ -53,7 +55,7 @@ func PayGreen(c echo.Context) error {
 func QueryGreen(c echo.Context) error {
 	reqDto := wxpay.ReqQueryDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
 	}
 
 	account := Account()
@@ -122,7 +124,7 @@ func ReverseGreen(c echo.Context) error {
 func RefundQueryGreen(c echo.Context) error {
 	reqDto := wxpay.ReqRefundQueryDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
 	}
 
 	account := Account()
@@ -135,9 +137,55 @@ func RefundQueryGreen(c echo.Context) error {
 	}
 	result, err := wxpay.RefundQuery(reqDto, customDto)
 	if err != nil {
-		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
 	}
 	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+}
+
+func PrePayGreen(c echo.Context) error {
+	reqDto := wxpay.ReqPrePayDto{}
+	if err := c.Bind(&reqDto); err != nil {
+		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+	}
+
+	account := Account()
+	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+		AppId: account.AppId,
+		MchId: account.MchId,
+	}
+	customDto := wxpay.ReqCustomerDto{
+		Key: account.Key,
+	}
+	result, err := wxpay.PrePay(reqDto, customDto)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+	}
+	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+}
+
+func NotifyGreen(c echo.Context) error {
+
+	errResult := struct {
+		XMLName    xml.Name `xml:"xml"`
+		ReturnCode string   `xml:"return_code"`
+		ReturnMsg  string   `xml:"return_msg"`
+	}{xml.Name{}, "FAIL", ""}
+
+	body, err := ioutil.ReadAll(c.Request().Body)
+	if err != nil {
+		errResult.ReturnMsg = err.Error()
+		return c.XML(http.StatusBadRequest, errResult)
+	}
+	xmlBody := string(body)
+	if len(xmlBody) == 0 {
+		return c.XML(http.StatusBadRequest, errResult)
+	}
+	result, err := wxpay.Notify(xmlBody)
+	if err != nil {
+		errResult.ReturnMsg = err.Error()
+		return c.XML(http.StatusBadRequest, errResult)
+	}
+	return c.XML(http.StatusOK, result)
 }
 
 func Account() greenAccount {
