@@ -1,2 +1,3 @@
-# lemon-wxpay-api
-api using lemon-sdk
+# lemon-wxpay-sdk-api
+api using lemon-wxpay-sdk
+
