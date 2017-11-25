@@ -1,4 +1,4 @@
-package main
+package wxpayapi
 
 import (
 	"encoding/xml"
@@ -12,6 +12,20 @@ import (
 
 	"github.com/labstack/echo"
 )
+
+var (
+	EnvParam = &EnvParamDto{}
+)
+
+type EnvParamDto struct {
+	AppEnv   string
+	AppId    string
+	Key      string
+	MchId    string
+	CertName string
+	CertKey  string
+	RootCa   string
+}
 
 func PayGreen(c echo.Context) error {
 	reqDto := wxpay.ReqPayDto{}
@@ -190,8 +204,8 @@ func NotifyGreen(c echo.Context) error {
 
 func Account() greenAccount {
 
-	account := greenAccount{AppId: envParam.AppId, Key: envParam.Key, MchId: envParam.MchId,
-		CertPathName: envParam.CertName, CertPathKey: envParam.CertKey, RootCa: envParam.RootCa,
+	account := greenAccount{AppId: EnvParam.AppId, Key: EnvParam.Key, MchId: EnvParam.MchId,
+		CertPathName: EnvParam.CertName, CertPathKey: EnvParam.CertKey, RootCa: EnvParam.RootCa,
 	}
 	return account
 }

@@ -1,4 +1,4 @@
-package main
+package wxpayapi
 
 import (
 	"encoding/json"
