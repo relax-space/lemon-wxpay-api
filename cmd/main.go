@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	wxpayapi "lemon-wxpay-api"
 	"net/http"
 	"os"
 
@@ -17,22 +18,11 @@ var (
 	certName = flag.String("CERT_NAME", os.Getenv("CERT_NAME"), "CERT_NAME")
 	certKey  = flag.String("CERT_KEY", os.Getenv("CERT_KEY"), "CERT_KEY")
 	rootCa   = flag.String("ROOT_CA", os.Getenv("ROOT_CA"), "ROOT_CA")
-	envParam = &EnvParam{}
 )
-
-type EnvParam struct {
-	AppEnv   string
-	AppId    string
-	Key      string
-	MchId    string
-	CertName string
-	CertKey  string
-	RootCa   string
-}
 
 func main() {
 	flag.Parse()
-	envParam = &EnvParam{
+	wxpayapi.EnvParam = &wxpayapi.EnvParamDto{
 		AppEnv:   *appEnv,
 		AppId:    *appId,
 		Key:      *key,
@@ -58,12 +48,12 @@ func RegApi(e *echo.Echo) {
 
 	v1 := e.Group("/v1")
 	green := v1.Group("/green")
-	green.POST("/pay", PayGreen)
-	green.POST("/query", QueryGreen)
-	green.POST("/reverse", ReverseGreen)
-	green.POST("/refund", RefundGreen)
-	green.POST("/refundquery", RefundQueryGreen)
-	green.POST("/prepay", PrePayGreen)
-	green.POST("/notify", NotifyGreen)
+	green.POST("/pay", wxpayapi.PayGreen)
+	green.POST("/query", wxpayapi.QueryGreen)
+	green.POST("/reverse", wxpayapi.ReverseGreen)
+	green.POST("/refund", wxpayapi.RefundGreen)
+	green.POST("/refundquery", wxpayapi.RefundQueryGreen)
+	green.POST("/prepay", wxpayapi.PrePayGreen)
+	green.POST("/notify", wxpayapi.NotifyGreen)
 
 }

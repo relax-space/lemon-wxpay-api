@@ -7,11 +7,11 @@ RUN go get github.com/relax-space/lemon-wxpay-sdk && \
 
 
 # add application
-ADD . /go/src/lemon-wxpay-sdk-api
-WORKDIR /go/src/lemon-wxpay-sdk-api
+ADD . /go/src/lemon-wxpay-api
+WORKDIR /go/src/lemon-wxpay-api/cmd
 RUN tar xf tmp/wxcert.tar.gz
-RUN go install
+RUN go build -o wxpay-api.exe
 
 EXPOSE 5000
 
-CMD ["lemon-wxpay-sdk-api"]
+CMD ["wxpay-api"]
