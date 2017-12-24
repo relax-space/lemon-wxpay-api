@@ -30,11 +30,11 @@ type EnvParamDto struct {
 func PayGreen(c echo.Context) error {
 	reqDto := wxpay.ReqPayDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusBadRequest, ErrorResult(err.Error()))
 	}
 
 	account := Account()
-	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+	reqDto.ReqBaseDto = &wxpay.ReqBaseDto{
 		AppId: account.AppId,
 		MchId: account.MchId,
 	}
@@ -50,30 +50,30 @@ func PayGreen(c echo.Context) error {
 			}
 			result, err = wxpay.LoopQuery(&queryDto, &customDto, 40, 2)
 			if err == nil {
-				return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+				return c.JSON(http.StatusOK, SuccessResult(result))
 			} else {
 				reverseDto := wxpay.ReqReverseDto{
 					ReqBaseDto: reqDto.ReqBaseDto,
 					OutTradeNo: result["out_trade_no"].(string),
 				}
 				_, err = wxpay.Reverse(&reverseDto, &customDto, 10, 10)
-				return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+				return c.JSON(http.StatusInternalServerError, ErrorResult(err.Error()))
 			}
 		} else {
-			return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+			return c.JSON(http.StatusInternalServerError, ErrorResult(err.Error()))
 		}
 	}
-	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+	return c.JSON(http.StatusOK, SuccessResult(result))
 }
 
 func QueryGreen(c echo.Context) error {
 	reqDto := wxpay.ReqQueryDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusBadRequest, ErrorResult(err.Error()))
 	}
 
 	account := Account()
-	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+	reqDto.ReqBaseDto = &wxpay.ReqBaseDto{
 		AppId: account.AppId,
 		MchId: account.MchId,
 	}
@@ -82,18 +82,18 @@ func QueryGreen(c echo.Context) error {
 	}
 	result, err := wxpay.Query(&reqDto, &customDto)
 	if err != nil {
-		return c.JSON(http.StatusOK, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusOK, ErrorResult(err.Error()))
 	}
-	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+	return c.JSON(http.StatusOK, SuccessResult(result))
 }
 func RefundGreen(c echo.Context) error {
 	reqDto := wxpay.ReqRefundDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusBadRequest, ErrorResult(err.Error()))
 	}
 	account := Account()
 	fmt.Println(account)
-	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+	reqDto.ReqBaseDto = &wxpay.ReqBaseDto{
 		AppId: account.AppId,
 		MchId: account.MchId,
 	}
@@ -105,19 +105,19 @@ func RefundGreen(c echo.Context) error {
 	}
 	result, err := wxpay.Refund(&reqDto, &custDto)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusInternalServerError, ErrorResult(err.Error()))
 
 	}
-	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+	return c.JSON(http.StatusOK, SuccessResult(result))
 
 }
 func ReverseGreen(c echo.Context) error {
 	reqDto := wxpay.ReqReverseDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusBadRequest, ErrorResult(err.Error()))
 	}
 	account := Account()
-	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+	reqDto.ReqBaseDto = &wxpay.ReqBaseDto{
 		AppId: account.AppId,
 		MchId: account.MchId,
 	}
@@ -129,20 +129,20 @@ func ReverseGreen(c echo.Context) error {
 	}
 	result, err := wxpay.Reverse(&reqDto, &custDto, 10, 10)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusInternalServerError, ErrorResult(err.Error()))
 
 	}
-	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+	return c.JSON(http.StatusOK, SuccessResult(result))
 }
 
 func RefundQueryGreen(c echo.Context) error {
 	reqDto := wxpay.ReqRefundQueryDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusBadRequest, ErrorResult(err.Error()))
 	}
 
 	account := Account()
-	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+	reqDto.ReqBaseDto = &wxpay.ReqBaseDto{
 		AppId: account.AppId,
 		MchId: account.MchId,
 	}
@@ -151,30 +151,30 @@ func RefundQueryGreen(c echo.Context) error {
 	}
 	result, err := wxpay.RefundQuery(&reqDto, &customDto)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusInternalServerError, ErrorResult(err.Error()))
 	}
-	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+	return c.JSON(http.StatusOK, SuccessResult(result))
 }
 
 func PrePayGreen(c echo.Context) error {
-	reqDto := wxpay.ReqPrePayDto{}
+	reqDto := wxpay.ReqPrepayDto{}
 	if err := c.Bind(&reqDto); err != nil {
-		return c.JSON(http.StatusBadRequest, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusBadRequest, ErrorResult(err.Error()))
 	}
 
 	account := Account()
-	reqDto.ReqBaseDto = wxpay.ReqBaseDto{
+	reqDto.ReqBaseDto = &wxpay.ReqBaseDto{
 		AppId: account.AppId,
 		MchId: account.MchId,
 	}
 	customDto := wxpay.ReqCustomerDto{
 		Key: account.Key,
 	}
-	result, err := wxpay.PrePay(&reqDto, &customDto)
+	result, err := wxpay.Prepay(&reqDto, &customDto)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, model.Result{Success: false, Error: model.Error{Code: 10004, Message: err.Error()}})
+		return c.JSON(http.StatusInternalServerError, ErrorResult(err.Error()))
 	}
-	return c.JSON(http.StatusOK, model.Result{Success: true, Result: result})
+	return c.JSON(http.StatusOK, SuccessResult(result))
 }
 
 func NotifyGreen(c echo.Context) error {
@@ -217,4 +217,18 @@ type greenAccount struct {
 	CertPathName string
 	CertPathKey  string
 	RootCa       string
+}
+
+func ErrorResult(errMsg string) (result model.Result) {
+	result = model.Result{
+		Error: model.Error{Message: errMsg},
+	}
+	return
+}
+func SuccessResult(param interface{}) (result model.Result) {
+	result = model.Result{
+		Success: true,
+		Result:  param,
+	}
+	return
 }
